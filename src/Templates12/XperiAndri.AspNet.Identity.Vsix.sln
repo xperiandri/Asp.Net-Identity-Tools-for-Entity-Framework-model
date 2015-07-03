@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XperiAndri.AspNet.Identity.DatabaseTemplate", "XperiAndri.AspNet.Identity.DatabaseTemplate\XperiAndri.AspNet.Identity.DatabaseTemplate.csproj", "{986551AB-67E4-49E3-838A-04B9746DC495}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XperiAndri.AspNet.Identity.Package", "XperiAndri.AspNet.Identity.Package\XperiAndri.AspNet.Identity.Package.csproj", "{6BAC2720-22D7-46AA-B8A1-0544DA05861D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XperiAndri.AspNet.Identity.EntitiesTemplate", "XperiAndri.AspNet.Identity.EntitiesTemplate\XperiAndri.AspNet.Identity.EntitiesTemplate.csproj", "{4952F6B5-A3CC-44DD-9950-920EA59A518D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XperiAndri.AspNet.Identity.EFDesignerExtension", "XperiAndri.AspNet.Identity.EFDesignerExtension\XperiAndri.AspNet.Identity.EFDesignerExtension.csproj", "{F442FE9B-F0C8-46D1-BB4B-FDDC42F1745B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{986551AB-67E4-49E3-838A-04B9746DC495}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{986551AB-67E4-49E3-838A-04B9746DC495}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{986551AB-67E4-49E3-838A-04B9746DC495}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{986551AB-67E4-49E3-838A-04B9746DC495}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BAC2720-22D7-46AA-B8A1-0544DA05861D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BAC2720-22D7-46AA-B8A1-0544DA05861D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BAC2720-22D7-46AA-B8A1-0544DA05861D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BAC2720-22D7-46AA-B8A1-0544DA05861D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4952F6B5-A3CC-44DD-9950-920EA59A518D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4952F6B5-A3CC-44DD-9950-920EA59A518D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4952F6B5-A3CC-44DD-9950-920EA59A518D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4952F6B5-A3CC-44DD-9950-920EA59A518D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F442FE9B-F0C8-46D1-BB4B-FDDC42F1745B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F442FE9B-F0C8-46D1-BB4B-FDDC42F1745B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F442FE9B-F0C8-46D1-BB4B-FDDC42F1745B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F442FE9B-F0C8-46D1-BB4B-FDDC42F1745B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = 00ed361c-382d-4ca3-a0b1-65c92491ceda
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = 02bdab8d-8764-4a38-bae6-2fd76b61c44c
+	EndGlobalSection
+EndGlobal

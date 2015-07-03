@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+    <Metadata>
+        <Identity Id="ASP.NET.Identity.EF.Model.Tools.12" Version="1.0" Language="en-US" Publisher="Chebukin Andrii" />
+        <DisplayName>ASP.NET Identity tools for Entity Framework model</DisplayName>
+        <Description xml:space="preserve">This package contains a set of tools and templates to simplify usage of Entity Framework model aзproach with ASP.NET Identity:
+Entity Framework designer extension
+Item template for ASP.NET Identity objects generation
+SQL Database project template for ASP.NET Identity 2.0 with GUID key columns</Description>
+        <MoreInfo>https://github.com/xperiandri/AspNet.Identity</MoreInfo>
+        <License>LICENSE.txt</License>
+        <GettingStartedGuide>https://github.com/xperiandri/AspNet.Identity/blob/master/docs/Database-First.md</GettingStartedGuide>
+        <Icon>PackageIcon.ico</Icon>
+        <Tags>Database, ASP.NET, SSDT, ASP.NET Identity, SQL Database, GUID</Tags>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[12.0,12.0]" />
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5.1,)" />
+        <Dependency d:Source="Installed" Id="Microsoft.VisualStudio.Data.Tools" DisplayName="SQL Server Data Tools" Version="[1.4,2.0)" d:InstallSource="Download" Location="https://msdn.microsoft.com/en-us/data/hh297027" />
+    </Dependencies>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="XperiAndri.AspNet.Identity.DatabaseTemplate" d:TargetPath="|XperiAndri.AspNet.Identity.DatabaseTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+        <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:TargetPath="|XperiAndri.AspNet.Identity.EntitiesTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="XperiAndri.AspNet.Identity.EFDesignerExtension" Path="|XperiAndri.AspNet.Identity.EFDesignerExtension|" />
+    </Assets>
+</PackageManifest>

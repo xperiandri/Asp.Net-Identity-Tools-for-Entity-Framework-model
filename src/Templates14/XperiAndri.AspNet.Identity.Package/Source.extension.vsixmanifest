@@ -3,7 +3,7 @@
     <Metadata>
         <Identity Id="ASP.NET.Identity.EF.Model.Tools.14" Version="1.0" Language="en-US" Publisher="Chebukin Andrii" />
         <DisplayName>ASP.NET Identity tools for Entity Framework model</DisplayName>
-        <Description xml:space="preserve">This package contains a set of tools and templates to simplify usage of Entity Framework model aзproach with ASP.NET Identity:
+        <Description xml:space="preserve">This package contains a set of tools and templates to simplify usage of Entity Framework data model with ASP.NET Identity:
 Entity Framework designer extension
 Item template for ASP.NET Identity objects generation
 SQL Database project template for ASP.NET Identity 2.0 with GUID key columns</Description>

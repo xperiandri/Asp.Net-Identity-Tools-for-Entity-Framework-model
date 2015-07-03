@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>ASP.NET Identity Guid Key Database</Name>
+    <Description>SQL Database project template for ASP.NET Identity 2 with GUID key columns.</Description>
+    <Icon>TemplateIcon.ico</Icon>
+    <ProjectType>SQLDB</ProjectType>
+    <SortOrder>1000</SortOrder>
+    <TemplateID>46c64127-637c-46d1-9aa6-137ea25760eb</TemplateID>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>IdentityDatabase</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+  </TemplateData>
+  <TemplateContent>
+    <Project TargetFileName="$projectname$.sqlproj" File="XperiAndri.AspNetIdentity.Database.sqlproj" ReplaceParameters="true">
+      <Folder Name="Properties" TargetFolderName="Properties" />
+      <Folder Name="Publish Profiles" TargetFolderName="Publish Profiles">
+        <ProjectItem ReplaceParameters="true" TargetFileName="Local.publish.xml">Local.publish.xml</ProjectItem>
+      </Folder>
+      <Folder Name="Reference Data" TargetFolderName="Reference Data">
+        <ProjectItem ReplaceParameters="true" TargetFileName="RolesOfUsers.sql">RolesOfUsers.sql</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="UserRoles.sql">UserRoles.sql</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Users.sql">Users.sql</ProjectItem>
+      </Folder>
+      <Folder Name="Scripts" TargetFolderName="Scripts">
+        <ProjectItem ReplaceParameters="true" TargetFileName="PostDeployment.sql">PostDeployment.sql</ProjectItem>
+      </Folder>
+      <Folder Name="Tables" TargetFolderName="Tables">
+        <ProjectItem ReplaceParameters="true" TargetFileName="RolesOfUsers.sql">RolesOfUsers.sql</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="UserClaims.sql">UserClaims.sql</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="UserLogins.sql">UserLogins.sql</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="UserRoles.sql">UserRoles.sql</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Users.sql">Users.sql</ProjectItem>
+      </Folder>
+      <Folder Name="User Defined Types" TargetFolderName="User Defined Types">
+        <ProjectItem ReplaceParameters="true" TargetFileName="Email.sql">Email.sql</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Flag.sql">Flag.sql</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Name.sql">Name.sql</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Phone.sql">Phone.sql</ProjectItem>
+      </Folder>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

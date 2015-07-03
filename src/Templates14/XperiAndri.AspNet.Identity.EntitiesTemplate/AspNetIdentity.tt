@@ -1,0 +1,1121 @@
+﻿<#@ template language="C#" debug="false" hostspecific="true"#>
+<#@ include file="EF6.Utility.CS.ttinclude"#><#@
+ output extension=".cs"#><#
+
+const string inputFile = @"$edmxInputFile$";
+const string userStoreClassName = @"UserStore";
+const string roleStoreClassName = @"RoleStore";
+var textTransform = DynamicTextTransformation.Create(this);
+var code = new CodeGenerationTools(this);
+var ef = new MetadataTools(this);
+var typeMapper = new TypeMapper(code, ef, textTransform.Errors);
+var	fileManager = EntityFrameworkTemplateFileManager.Create(this);
+var loader = new EdmMetadataLoader(textTransform.Host, textTransform.Errors);
+var itemCollection = loader.CreateEdmItemCollection(inputFile);
+var identities = typeMapper.GetIdentitiesToGenerate(itemCollection);
+var modelNamespace = loader.GetModelNamespace(inputFile);
+var codeStringGenerator = new CodeStringGenerator(code, typeMapper, ef);
+
+var container = itemCollection.OfType<EntityContainer>().FirstOrDefault();
+if (container == null)
+{
+    return string.Empty;
+}
+IdentityData userIdentity;
+IdentityData roleIdentity;
+IdentityData loginIdentity;
+IdentityData claimIdentity;
+if (!CheckAndGetAllEntities(identities, inputFile, textTransform.Errors, out userIdentity, out roleIdentity, out loginIdentity, out claimIdentity))
+{
+    return string.Empty;
+}
+
+WriteHeader(codeStringGenerator, fileManager);
+
+BeginNamespace(code);
+#>
+using System;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+
+// You can add profile data for the user by adding more properties to your ApplicationUser class, please visit tp://.microsoft.com/fwlink/?LinkID=317594 to learn more.
+public class ApplicationUser : IdentityUser
+{
+}
+
+<#=codeStringGenerator.EntityClassOpening(userIdentity.EntityType)#> : IUser<<#=userIdentity.KeyType#>>
+{
+    Guid IUser<<#=userIdentity.KeyType#>>.Id
+    {
+        get { return <#=userIdentity.KeyName#>; }
+    }
+}
+
+<#=codeStringGenerator.EntityClassOpening(roleIdentity.EntityType)#> : IRole<<#=roleIdentity.KeyType#>>
+{
+    Guid IRole<<#=roleIdentity.KeyType#>>.Id
+    {
+        get { return <#=roleIdentity.KeyName#>; }
+    }
+}
+<#
+EndNamespace(code);
+
+fileManager.StartNewFile(userStoreClassName + ".cs");
+BeginNamespace(code);
+#>
+using Microsoft.AspNet.Identity;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Globalization;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+
+<#=codeStringGenerator.UserStoreClassOpening(userIdentity, userStoreClassName)#>
+{
+<#
+var userEntitySet = code.Escape(userIdentity.EntitySet);
+var roleEntitySet = code.Escape(roleIdentity.EntitySet);
+#>
+    private readonly <#=code.Escape(container)#> db;
+
+    public <#=userStoreClassName#>(<#=code.Escape(container)#> db)
+    {
+        if (db == null)
+        {
+            throw new ArgumentNullException("db");
+        }
+        this.db = db;
+    }
+
+    #region IQueryableUserStore<TUser, TKey>
+
+    public IQueryable<<#=userIdentity.EntityName#>> Users
+    {
+        get { return this.db.<#=userEntitySet#>; }
+    }
+
+    #endregion IQueryableUserStore<TUser, TKey>
+
+    #region IUserStore<TUser, Key>
+
+    public Task CreateAsync(<#=userIdentity.EntityName#> user)
+    {
+        this.db.<#=userEntitySet#>.Add(user);
+        return this.db.SaveChangesAsync();
+    }
+
+    public Task DeleteAsync(<#=userIdentity.EntityName#> user)
+    {
+        this.db.<#=userEntitySet#>.Remove(user);
+        return this.db.SaveChangesAsync();
+    }
+
+    public Task<<#=userIdentity.EntityName#>> FindByIdAsync(Guid userId)
+    {
+        return this.db.<#=userEntitySet#>
+            .Include(u => u.Logins).Include(u => u.Roles).Include(u => u.Claims)
+            .FirstOrDefaultAsync(u => u.UserId.Equals(userId));
+    }
+
+    public Task<<#=userIdentity.EntityName#>> FindByNameAsync(string userName)
+    {
+        return this.db.<#=userEntitySet#>
+            .Include(u => u.Logins).Include(u => u.Roles).Include(u => u.Claims)
+            .FirstOrDefaultAsync(u => u.UserName == userName);
+    }
+
+    public Task UpdateAsync(<#=userIdentity.EntityName#> user)
+    {
+        this.db.Entry<<#=userIdentity.EntityName#>>(user).State = EntityState.Modified;
+        return this.db.SaveChangesAsync();
+    }
+
+    #endregion IUserStore<TUser, Key>
+
+    #region IUserPasswordStore<TUser, Key>
+
+    public Task<string> GetPasswordHashAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult(user.PasswordHash);
+    }
+
+    public Task<bool> HasPasswordAsync(<#=userIdentity.EntityName#> user)
+    {
+        return Task.FromResult(user.PasswordHash != null);
+    }
+
+    public Task SetPasswordHashAsync(<#=userIdentity.EntityName#> user, string passwordHash)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        user.PasswordHash = passwordHash;
+        return Task.FromResult(0);
+    }
+
+    #endregion IUserPasswordStore<TUser, Key>
+
+    #region IUserLoginStore<TUser, Key>
+
+    public Task AddLoginAsync(<#=userIdentity.EntityName#> user, UserLoginInfo login)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        if (login == null)
+        {
+            throw new ArgumentNullException("login");
+        }
+
+        var userLogin = Activator.CreateInstance<<#=loginIdentity.EntityName#>>();
+        userLogin.UserId = user.UserId;
+        userLogin.LoginProvider = login.ProviderKey;
+        userLogin.ProviderKey = login.ProviderKey;
+        user.Logins.Add(userLogin);
+        return Task.FromResult(0);
+    }
+
+    public async Task<<#=userIdentity.EntityName#>> FindAsync(UserLoginInfo login)
+    {
+        if (login == null)
+        {
+            throw new ArgumentNullException("login");
+        }
+
+        var provider = login.LoginProvider;
+        var key = login.ProviderKey;
+
+        var userLogin = await this.db.<#=code.Escape(loginIdentity.EntitySet)#>.FirstOrDefaultAsync(l => l.LoginProvider == provider && l.ProviderKey == key);
+
+        if (userLogin == null)
+        {
+            return default(<#=userIdentity.EntityName#>);
+        }
+
+        return await this.db.<#=userEntitySet#>
+            .Include(u => u.Logins).Include(u => u.Roles).Include(u => u.Claims)
+            .FirstOrDefaultAsync(u => u.UserId.Equals(userLogin.UserId));
+    }
+
+    public Task<IList<UserLoginInfo>> GetLoginsAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult<IList<UserLoginInfo>>(user.Logins.Select(l => new UserLoginInfo(l.LoginProvider, l.ProviderKey)).ToList());
+    }
+
+    public Task RemoveLoginAsync(<#=userIdentity.EntityName#> user, UserLoginInfo login)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        if (login == null)
+        {
+            throw new ArgumentNullException("login");
+        }
+
+        var provider = login.LoginProvider;
+        var key = login.ProviderKey;
+
+        var item = user.Logins.SingleOrDefault(l => l.LoginProvider == provider && l.ProviderKey == key);
+
+        if (item != null)
+        {
+            user.Logins.Remove(item);
+        }
+
+        return Task.FromResult(0);
+    }
+
+    #endregion IUserLoginStore<TUser, Key>
+
+    #region IUserClaimStore<TUser, TKey>
+
+    public Task AddClaimAsync(<#=userIdentity.EntityName#> user, System.Security.Claims.Claim claim)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        if (claim == null)
+        {
+            throw new ArgumentNullException("claim");
+        }
+
+        var item = Activator.CreateInstance<<#=claimIdentity.EntityName#>>();
+        item.UserId = user.UserId;
+        item.ClaimType = claim.Type;
+        item.ClaimValue = claim.Value;
+        user.Claims.Add(item);
+        return Task.FromResult(0);
+    }
+
+    public Task<IList<System.Security.Claims.Claim>> GetClaimsAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult<IList<System.Security.Claims.Claim>>(user.Claims.Select(c => new System.Security.Claims.Claim(c.ClaimType, c.ClaimValue)).ToList());
+    }
+
+    public Task RemoveClaimAsync(<#=userIdentity.EntityName#> user, System.Security.Claims.Claim claim)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        if (claim == null)
+        {
+            throw new ArgumentNullException("claim");
+        }
+
+        foreach (var item in user.Claims.Where(uc => uc.ClaimValue == claim.Value && uc.ClaimType == claim.Type).ToList())
+        {
+            user.Claims.Remove(item);
+        }
+
+        foreach (var item in this.db.UserClaims.Where(uc => uc.UserId.Equals(user.UserId) && uc.ClaimValue == claim.Value && uc.ClaimType == claim.Type).ToList())
+        {
+            this.db.UserClaims.Remove(item);
+        }
+
+        return Task.FromResult(0);
+    }
+
+    #endregion IUserClaimStore<TUser, TKey>
+
+    #region IUserRoleStore<TUser, TKey>
+
+    public Task AddToRoleAsync(<#=userIdentity.EntityName#> user, string roleName)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        if (string.IsNullOrWhiteSpace(roleName))
+        {
+            throw new ArgumentException(Resources.ValueCannotBeNullOrEmpty, "roleName");
+        }
+
+        var userRole = this.db.<#=roleEntitySet#>.SingleOrDefault(r => r.Name == roleName);
+
+        if (userRole == null)
+        {
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.RoleNotFound, new object[] { roleName }));
+        }
+
+        user.Roles.Add(userRole);
+        return Task.FromResult(0);
+    }
+
+    public Task<IList<string>> GetRolesAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult<IList<string>>(user.Roles.Join(this.db.<#=roleEntitySet#>, ur => ur.RoleId, r => r.RoleId, (ur, r) => r.Name).ToList());
+    }
+
+    public Task<bool> IsInRoleAsync(<#=userIdentity.EntityName#> user, string roleName)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        if (string.IsNullOrWhiteSpace(roleName))
+        {
+            throw new ArgumentException(Resources.ValueCannotBeNullOrEmpty, "roleName");
+        }
+
+        return
+            Task.FromResult<bool>(
+                this.db.<#=roleEntitySet#>.Any(r => r.Name == roleName && r.Users.Any(u => u.UserId.Equals(user.UserId))));
+    }
+
+    public Task RemoveFromRoleAsync(<#=userIdentity.EntityName#> user, string roleName)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        if (string.IsNullOrWhiteSpace(roleName))
+        {
+            throw new ArgumentException(Resources.ValueCannotBeNullOrEmpty, "roleName");
+        }
+
+        var userRole = user.Roles.SingleOrDefault(r => r.Name == roleName);
+
+        if (userRole != null)
+        {
+            user.Roles.Remove(userRole);
+        }
+
+        return Task.FromResult(0);
+    }
+
+    #endregion IUserRoleStore<TUser, TKey>
+
+    #region IUserSecurityStampStore<TUser, TKey>
+
+    public Task<string> GetSecurityStampAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult(user.SecurityStamp);
+    }
+
+    public Task SetSecurityStampAsync(<#=userIdentity.EntityName#> user, string stamp)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        user.SecurityStamp = stamp;
+        return Task.FromResult(0);
+    }
+
+    #endregion IUserSecurityStampStore<TUser, TKey>
+
+    #region IUserEmailStore<TUser, TKey>
+
+    public Task<<#=userIdentity.EntityName#>> FindByEmailAsync(string email)
+    {
+        return this.db.<#=userEntitySet#>
+            .Include(u => u.Logins).Include(u => u.Roles).Include(u => u.Claims)
+            .FirstOrDefaultAsync(u => u.Email == email);
+    }
+
+    public Task<string> GetEmailAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult(user.Email);
+    }
+
+    public Task<bool> GetEmailConfirmedAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult(user.EmailConfirmed);
+    }
+
+    public Task SetEmailAsync(<#=userIdentity.EntityName#> user, string email)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        user.Email = email;
+        return Task.FromResult(0);
+    }
+
+    public Task SetEmailConfirmedAsync(<#=userIdentity.EntityName#> user, bool confirmed)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        user.EmailConfirmed = confirmed;
+        return Task.FromResult(0);
+    }
+
+    #endregion IUserEmailStore<TUser, TKey>
+
+    #region IUserPhoneNumberStore<TUser, TKey>
+
+    public Task<string> GetPhoneNumberAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult(user.PhoneNumber);
+    }
+
+    public Task<bool> GetPhoneNumberConfirmedAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult(user.PhoneNumberConfirmed);
+    }
+
+    public Task SetPhoneNumberAsync(<#=userIdentity.EntityName#> user, string phoneNumber)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        user.PhoneNumber = phoneNumber;
+        return Task.FromResult(0);
+    }
+
+    public Task SetPhoneNumberConfirmedAsync(<#=userIdentity.EntityName#> user, bool confirmed)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        user.PhoneNumberConfirmed = confirmed;
+        return Task.FromResult(0);
+    }
+
+    #endregion IUserPhoneNumberStore<TUser, TKey>
+
+    #region IUserTwoFactorStore<TUser, TKey>
+
+    public Task<bool> GetTwoFactorEnabledAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult(user.TwoFactorEnabled);
+    }
+
+    public Task SetTwoFactorEnabledAsync(<#=userIdentity.EntityName#> user, bool enabled)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        user.TwoFactorEnabled = enabled;
+        return Task.FromResult(0);
+    }
+
+    #endregion IUserTwoFactorStore<TUser, TKey>
+
+    #region IUserLockoutStore<TUser, TKey>
+
+    public Task<int> GetAccessFailedCountAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult(user.AccessFailedCount);
+    }
+
+    public Task<bool> GetLockoutEnabledAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult(user.LockoutEnabled);
+    }
+
+    public Task<DateTimeOffset> GetLockoutEndDateAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        return Task.FromResult(
+            user.LockoutEndDateUtc.HasValue ?
+                new DateTimeOffset(DateTime.SpecifyKind(user.LockoutEndDateUtc.Value, DateTimeKind.Utc)) :
+                new DateTimeOffset());
+    }
+
+    public Task<int> IncrementAccessFailedCountAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        user.AccessFailedCount++;
+        return Task.FromResult(user.AccessFailedCount);
+    }
+
+    public Task ResetAccessFailedCountAsync(<#=userIdentity.EntityName#> user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        user.AccessFailedCount = 0;
+        return Task.FromResult(0);
+    }
+
+    public Task SetLockoutEnabledAsync(<#=userIdentity.EntityName#> user, bool enabled)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        user.LockoutEnabled = enabled;
+        return Task.FromResult(0);
+    }
+
+    public Task SetLockoutEndDateAsync(<#=userIdentity.EntityName#> user, DateTimeOffset lockoutEnd)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException("user");
+        }
+
+        user.LockoutEndDateUtc = lockoutEnd == DateTimeOffset.MinValue ? null : new DateTime?(lockoutEnd.UtcDateTime);
+        return Task.FromResult(0);
+    }
+
+    #endregion IUserLockoutStore<TUser, TKey>
+
+    #region IDisposable
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing && this.db != null)
+        {
+            this.db.Dispose();
+        }
+    }
+
+    #endregion IDisposable
+}
+<#
+EndNamespace(code);
+
+fileManager.StartNewFile(roleStoreClassName + ".cs");
+BeginNamespace(code);
+#>
+using Microsoft.AspNet.Identity;
+using System;
+using System.Data.Entity;
+using System.Linq;
+using System.Threading.Tasks;
+
+public partial class <#=roleStoreClassName#> : IQueryableRoleStore<<#=roleIdentity.EntityName#>, <#=roleIdentity.KeyType#>>
+{
+<#
+#>
+    private readonly <#=code.Escape(container)#> db;
+
+    public <#=roleStoreClassName#>(<#=code.Escape(container)#> db)
+    {
+        this.db = db;
+    }
+
+    #region IQueryableRoleStore<TRole, TKey>
+
+    public IQueryable<<#=roleIdentity.EntityName#>> Roles
+    {
+        get { return this.db.<#=roleEntitySet#>; }
+    }
+
+    #endregion IQueryableRoleStore<TRole, TKey>
+
+    #region IRoleStore<TRole, TKey>
+
+    public virtual Task CreateAsync(<#=roleIdentity.EntityName#> role)
+    {
+        if (role == null)
+        {
+            throw new ArgumentNullException("role");
+        }
+
+        this.db.<#=roleEntitySet#>.Add(role);
+        return this.db.SaveChangesAsync();
+    }
+
+    public Task DeleteAsync(<#=roleIdentity.EntityName#> role)
+    {
+        if (role == null)
+        {
+            throw new ArgumentNullException("role");
+        }
+
+        this.db.<#=roleEntitySet#>.Remove(role);
+        return this.db.SaveChangesAsync();
+    }
+
+    public Task<<#=roleIdentity.EntityName#>> FindByIdAsync(<#=roleIdentity.KeyType#> roleId)
+    {
+        return this.db.<#=roleEntitySet#>.FindAsync(new[] { roleId });
+    }
+
+    public Task<<#=roleIdentity.EntityName#>> FindByNameAsync(string roleName)
+    {
+        return this.db.<#=roleEntitySet#>.FirstOrDefaultAsync(r => r.Name == roleName);
+    }
+
+    public Task UpdateAsync(<#=roleIdentity.EntityName#> role)
+    {
+        if (role == null)
+        {
+            throw new ArgumentNullException("role");
+        }
+
+        this.db.Entry(role).State = EntityState.Modified;
+        return this.db.SaveChangesAsync();
+    }
+
+    #endregion IRoleStore<TUserRole, TKey>
+
+    #region IDisposable
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing && this.db != null)
+        {
+            this.db.Dispose();
+        }
+    }
+
+    #endregion IDisposable
+}
+<#
+EndNamespace(code);
+fileManager.Process();
+#>
+<#+
+
+public void WriteHeader(CodeStringGenerator codeStringGenerator, EntityFrameworkTemplateFileManager fileManager)
+{
+    fileManager.StartHeader();
+#>
+//------------------------------------------------------------------------------
+// <auto-generated>
+// <#=CodeGenerationTools.GetResourceString("Template_GeneratedCodeCommentLine1")#>
+//
+// <#=CodeGenerationTools.GetResourceString("Template_GeneratedCodeCommentLine2")#>
+// <#=CodeGenerationTools.GetResourceString("Template_GeneratedCodeCommentLine3")#>
+// </auto-generated>
+//------------------------------------------------------------------------------
+<#+
+    fileManager.EndBlock();
+}
+
+public void BeginNamespace(CodeGenerationTools code)
+{
+    var codeNamespace = code.VsNamespaceSuggestion();
+    if (!String.IsNullOrEmpty(codeNamespace))
+    {
+#>
+namespace <#=code.EscapeNamespace(codeNamespace)#>
+{
+<#+
+        PushIndent("    ");
+    }
+}
+
+public void EndNamespace(CodeGenerationTools code)
+{
+    if (!String.IsNullOrEmpty(code.VsNamespaceSuggestion()))
+    {
+        PopIndent();
+#>
+}
+<#+
+    }
+}
+
+/// <summary>
+/// Looks into <see ref="identities"/> and tries to get entity of each identity type.
+/// </summary>
+/// <return>If entities of each identity type exist in the model.</return>
+public bool CheckAndGetAllEntities(Dictionary<IdetityTypes, IdentityData> identities, string inputFile, System.Collections.IList errors, out IdentityData userIdentity, out IdentityData roleIdentity, out IdentityData loginIdentity, out IdentityData claimIdentity)
+{
+    bool hasUser = CheckAndGetEntity(identities, IdetityTypes.User, inputFile, errors, out userIdentity);
+    bool hasRole = CheckAndGetEntity(identities, IdetityTypes.Role, inputFile, errors, out roleIdentity);
+    bool hasLogin = CheckAndGetEntity(identities, IdetityTypes.Login, inputFile, errors, out loginIdentity);
+    bool hasClaim = CheckAndGetEntity(identities, IdetityTypes.Claim, inputFile, errors, out claimIdentity);
+
+    return hasUser && hasRole && hasLogin && hasClaim;
+}
+
+// TODO: Add help url
+static readonly string entityErrorText = "{0} entity does not exist in the model {1} or not mapped.";
+static readonly string keyErrorText = "Cannot determine which property is identity in {0} entity. It either does not have a key property with StoreGeneratedPattern value of Identity or have multiple of them.";
+
+private bool CheckAndGetEntity(Dictionary<IdetityTypes, IdentityData> identities, IdetityTypes idetityType, string inputFile, System.Collections.IList errors, out IdentityData identity)
+{
+    bool hasIdentity = identities.TryGetValue(idetityType, out identity);
+    bool hasKey = false;
+
+    if (hasIdentity)
+    {
+        hasKey = identity.IsKeyFound;
+        if (!hasKey)
+            errors.Add(new CompilerError(inputFile, 0, 0, string.Empty, string.Format(keyErrorText, identity.EntityName)));
+    }
+    else
+        errors.Add(new CompilerError(inputFile, 0, 0, string.Empty, string.Format(entityErrorText, IdetityTypes.User, inputFile)));
+
+    return hasIdentity && hasKey;
+}
+#>
+<#+
+public class CodeStringGenerator
+{
+    private readonly CodeGenerationTools _code;
+    private readonly TypeMapper _typeMapper;
+    private readonly MetadataTools _ef;
+
+    public CodeStringGenerator(CodeGenerationTools code, TypeMapper typeMapper, MetadataTools ef)
+    {
+        ArgumentNotNull(code, "code");
+        ArgumentNotNull(typeMapper, "typeMapper");
+        ArgumentNotNull(ef, "ef");
+
+        _code = code;
+        _typeMapper = typeMapper;
+        _ef = ef;
+    }
+
+    public string EntityClassOpening(EntityType entity)
+    {
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0} {1}partial class {2}{3}",
+            Accessibility.ForType(entity),
+            _code.SpaceAfter(_code.AbstractOption(entity)),
+            _code.Escape(entity),
+            _code.StringBefore(" : ", _typeMapper.GetTypeName(entity.BaseType)));
+    }
+
+    public string UserStoreClassOpening(IdentityData userIdentity, string userStoreClassName)
+    {
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            @"public partial class {0} :
+    IQueryableUserStore<{1}, {2}>, IUserPasswordStore<{1}, {2}>, IUserLoginStore<{1}, {2}>,
+    IUserClaimStore<{1}, {2}>, IUserRoleStore<{1}, {2}>, IUserSecurityStampStore<{1}, {2}>,
+    IUserEmailStore<{1}, {2}>, IUserPhoneNumberStore<{1}, {2}>, IUserTwoFactorStore<{1}, {2}>,
+    IUserLockoutStore<{1}, {2}>", userStoreClassName, userIdentity.EntityName, userIdentity.KeyType);
+    }
+}
+
+public class TypeMapper
+{
+    private const string ExternalTypeNameAttributeName = @"http://schemas.microsoft.com/ado/2006/04/codegeneration:ExternalTypeName";
+    static readonly string AspNetIdentityAttributeName = @"http://schemas.xperiandri.com/AspNetIdentity:AspNetIdentityType";
+
+    private readonly System.Collections.IList _errors;
+    private readonly CodeGenerationTools _code;
+    private readonly MetadataTools _ef;
+
+    public static string FixNamespaces(string typeName)
+    {
+        return typeName.Replace("System.Data.Spatial.", "System.Data.Entity.Spatial.");
+    }
+
+    public TypeMapper(CodeGenerationTools code, MetadataTools ef, System.Collections.IList errors)
+    {
+        ArgumentNotNull(code, "code");
+        ArgumentNotNull(ef, "ef");
+        ArgumentNotNull(errors, "errors");
+
+        _code = code;
+        _ef = ef;
+        _errors = errors;
+    }
+
+    public string GetTypeName(TypeUsage typeUsage)
+    {
+        return typeUsage == null ? null : GetTypeName(typeUsage.EdmType, _ef.IsNullable(typeUsage), modelNamespace: null);
+    }
+
+    public string GetTypeName(EdmType edmType)
+    {
+        return GetTypeName(edmType, isNullable: null, modelNamespace: null);
+    }
+
+    public string GetTypeName(TypeUsage typeUsage, string modelNamespace)
+    {
+        return typeUsage == null ? null : GetTypeName(typeUsage.EdmType, _ef.IsNullable(typeUsage), modelNamespace);
+    }
+
+    public string GetTypeName(EdmType edmType, string modelNamespace)
+    {
+        return GetTypeName(edmType, isNullable: null, modelNamespace: modelNamespace);
+    }
+
+    public string GetTypeName(EdmType edmType, bool? isNullable, string modelNamespace)
+    {
+        if (edmType == null)
+        {
+            return null;
+        }
+
+        var collectionType = edmType as CollectionType;
+        if (collectionType != null)
+        {
+            return String.Format(CultureInfo.InvariantCulture, "ICollection<{0}>", GetTypeName(collectionType.TypeUsage, modelNamespace));
+        }
+
+        var typeName = _code.Escape(edmType.MetadataProperties
+                                .Where(p => p.Name == ExternalTypeNameAttributeName)
+                                .Select(p => (string)p.Value)
+                                .FirstOrDefault())
+            ?? (modelNamespace != null && edmType.NamespaceName != modelNamespace ?
+                _code.CreateFullName(_code.EscapeNamespace(edmType.NamespaceName), _code.Escape(edmType)) :
+                _code.Escape(edmType));
+
+        if (edmType is StructuralType)
+        {
+            return typeName;
+        }
+
+        if (edmType is SimpleType)
+        {
+            var clrType = UnderlyingClrType(edmType);
+            if (!IsEnumType(edmType))
+            {
+                typeName = _code.Escape(clrType);
+            }
+
+            typeName = FixNamespaces(typeName);
+
+            return clrType.IsValueType && isNullable == true ?
+                String.Format(CultureInfo.InvariantCulture, "Nullable<{0}>", typeName) :
+                typeName;
+        }
+
+        throw new ArgumentException("edmType");
+    }
+
+    public Type UnderlyingClrType(EdmType edmType)
+    {
+        ArgumentNotNull(edmType, "edmType");
+
+        var primitiveType = edmType as PrimitiveType;
+        if (primitiveType != null)
+        {
+            return primitiveType.ClrEquivalentType;
+        }
+
+        if (IsEnumType(edmType))
+        {
+            return GetEnumUnderlyingType(edmType).ClrEquivalentType;
+        }
+
+        return typeof(object);
+    }
+
+    public object GetEnumMemberValue(MetadataItem enumMember)
+    {
+        ArgumentNotNull(enumMember, "enumMember");
+
+        var valueProperty = enumMember.GetType().GetProperty("Value");
+        return valueProperty == null ? null : valueProperty.GetValue(enumMember, null);
+    }
+
+    public string GetEnumMemberName(MetadataItem enumMember)
+    {
+        ArgumentNotNull(enumMember, "enumMember");
+
+        var nameProperty = enumMember.GetType().GetProperty("Name");
+        return nameProperty == null ? null : (string)nameProperty.GetValue(enumMember, null);
+    }
+
+    public System.Collections.IEnumerable GetEnumMembers(EdmType enumType)
+    {
+        ArgumentNotNull(enumType, "enumType");
+
+        var membersProperty = enumType.GetType().GetProperty("Members");
+        return membersProperty != null
+            ? (System.Collections.IEnumerable)membersProperty.GetValue(enumType, null)
+            : Enumerable.Empty<MetadataItem>();
+    }
+
+    public bool EnumIsFlags(EdmType enumType)
+    {
+        ArgumentNotNull(enumType, "enumType");
+
+        var isFlagsProperty = enumType.GetType().GetProperty("IsFlags");
+        return isFlagsProperty != null && (bool)isFlagsProperty.GetValue(enumType, null);
+    }
+
+    public bool IsEnumType(GlobalItem edmType)
+    {
+        ArgumentNotNull(edmType, "edmType");
+
+        return edmType.GetType().Name == "EnumType";
+    }
+
+    public PrimitiveType GetEnumUnderlyingType(EdmType enumType)
+    {
+        ArgumentNotNull(enumType, "enumType");
+
+        return (PrimitiveType)enumType.GetType().GetProperty("UnderlyingType").GetValue(enumType, null);
+    }
+
+    public string CreateLiteral(object value)
+    {
+        if (value == null || value.GetType() != typeof(TimeSpan))
+        {
+            return _code.CreateLiteral(value);
+        }
+
+        return string.Format(CultureInfo.InvariantCulture, "new TimeSpan({0})", ((TimeSpan)value).Ticks);
+    }
+
+    public bool VerifyCaseInsensitiveTypeUniqueness(IEnumerable<string> types, string sourceFile)
+    {
+        ArgumentNotNull(types, "types");
+        ArgumentNotNull(sourceFile, "sourceFile");
+
+        var hash = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        if (types.Any(item => !hash.Add(item)))
+        {
+            _errors.Add(
+                new CompilerError(sourceFile, -1, -1, "6023",
+                    String.Format(CultureInfo.CurrentCulture, CodeGenerationTools.GetResourceString("Template_CaseInsensitiveTypeConflict"))));
+            return false;
+        }
+        return true;
+    }
+
+    public IEnumerable<T> GetItemsToGenerate<T>(IEnumerable<GlobalItem> itemCollection) where T: EdmType
+    {
+        return itemCollection
+            .OfType<T>()
+            .Where(i => !i.MetadataProperties.Any(p => p.Name == ExternalTypeNameAttributeName))
+            .OrderBy(i => i.Name);
+    }
+
+    public Dictionary<IdetityTypes, IdentityData> GetIdentitiesToGenerate(IEnumerable<GlobalItem> itemCollection)
+    {
+         return (from entitySet in itemCollection.OfType<EntityContainer>().Single().EntitySets
+                 let identityAttribute = entitySet.MetadataProperties.FirstOrDefault(p => p.Name ==  AspNetIdentityAttributeName)
+                 where identityAttribute != null
+                 select new
+                 {
+                     EntitySet = entitySet,
+                     IdentityType = (IdetityTypes)Enum.Parse(typeof(IdetityTypes),
+                            identityAttribute.Value.ToString())
+                 }).ToDictionary(e => e.IdentityType, e => new IdentityData(e.EntitySet, this));
+    }
+
+    public IEnumerable<string> GetAllGlobalItems(IEnumerable<GlobalItem> itemCollection)
+    {
+        return itemCollection
+            .Where(i => i is EntityType || i is ComplexType || i is EntityContainer || IsEnumType(i))
+            .Select(g => GetGlobalItemName(g));
+    }
+
+    public string GetGlobalItemName(GlobalItem item)
+    {
+        if (item is EdmType)
+        {
+            return ((EdmType)item).Name;
+        }
+        else
+        {
+            return ((EntityContainer)item).Name;
+        }
+    }
+
+    public IEnumerable<EdmProperty> GetSimpleProperties(EntityType type)
+    {
+        return type.Properties.Where(p => p.TypeUsage.EdmType is SimpleType && p.DeclaringType == type);
+    }
+
+}
+
+public static void ArgumentNotNull<T>(T arg, string name) where T : class
+{
+    if (arg == null)
+    {
+        throw new ArgumentNullException(name);
+    }
+}
+
+public class IdentityData
+{
+    private static readonly string storeGeneratedPatternAttributeName = @"http://schemas.microsoft.com/ado/2009/02/edm/annotation:StoreGeneratedPattern";
+
+    private readonly EdmMember key;
+    private readonly TypeMapper typeMapper;
+
+    public EntitySet EntitySet { get; private set; }
+    public string EntityName { get; private set; }
+    public EntityType EntityType { get; private set; }
+
+    public bool IsKeyFound { get { return key != null; } }
+    public string KeyName { get { return key.Name; } }
+    private string keyType;
+    public string KeyType { get { return keyType = keyType ?? typeMapper.GetTypeName(key.TypeUsage); } }
+
+    public IdentityData(EntitySet entitySet, TypeMapper typeMapper)
+    {
+        this.typeMapper = typeMapper;
+
+        EntitySet = entitySet;
+        EntityType = entitySet.ElementType;
+        EntityName = typeMapper.GetTypeName(entitySet.ElementType);
+        key = entitySet.ElementType.KeyMembers.SingleOrDefault(k => k.MetadataProperties.Any(p => p.Name ==  storeGeneratedPatternAttributeName && p.Value.ToString() == "Identity"));
+    }
+}
+
+public enum IdetityTypes
+{
+    User,
+    Role,
+    Login,
+    Claim
+}
+#>

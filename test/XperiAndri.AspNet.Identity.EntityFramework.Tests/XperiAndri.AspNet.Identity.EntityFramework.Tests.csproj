@@ -6,8 +6,8 @@
     <ProjectGuid>{EDB5DE31-B19F-4105-8150-093CADEEB206}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KriaSoft.AspNet.Identity.Model.Tests</RootNamespace>
-    <AssemblyName>KriaSoft.AspNet.Identity.Model.Tests</AssemblyName>
+    <RootNamespace>XperiAndri.AspNet.Identity.Model.Tests</RootNamespace>
+    <AssemblyName>XperiAndri.AspNet.Identity.Model.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -35,8 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.AspNet.Identity.Core">
-      <HintPath>..\..\packages\Microsoft.AspNet.Identity.Core.2.0.0\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
@@ -56,9 +57,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\KriaSoft.AspNet.Identity.EntityFramework\KriaSoft.AspNet.Identity.EntityFramework.csproj">
+    <ProjectReference Include="..\..\src\XperiAndri.AspNet.Identity.EntityFramework\XperiAndri.AspNet.Identity.EntityFramework.csproj">
       <Project>{311feca9-f3ce-49a7-b085-b9dafa25ca0a}</Project>
-      <Name>KriaSoft.AspNet.Identity.EntityFramework</Name>
+      <Name>XperiAndri.AspNet.Identity.EntityFramework</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

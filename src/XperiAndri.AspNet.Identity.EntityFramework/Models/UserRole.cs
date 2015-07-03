@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KriaSoft.AspNet.Identity.EntityFramework
+namespace XperiAndri.AspNet.Identity.EntityFramework.Models
 {
     using System;
     using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             this.Users = new HashSet<User>();
         }
     
-        public int Id { get; set; }
+        public System.Guid RoleId { get; set; }
         public string Name { get; set; }
     
         public virtual ICollection<User> Users { get; set; }

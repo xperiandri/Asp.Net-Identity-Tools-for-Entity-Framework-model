@@ -7,15 +7,15 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KriaSoft.AspNet.Identity.EntityFramework
+namespace XperiAndri.AspNet.Identity.EntityFramework.Models
 {
     using System;
     using System.Collections.Generic;
     
     public partial class UserClaim
     {
-        public int Id { get; set; }
-        public int UserId { get; set; }
+        public System.Guid UserId { get; set; }
+        public System.Guid ClaimID { get; set; }
         public string ClaimType { get; set; }
         public string ClaimValue { get; set; }
     

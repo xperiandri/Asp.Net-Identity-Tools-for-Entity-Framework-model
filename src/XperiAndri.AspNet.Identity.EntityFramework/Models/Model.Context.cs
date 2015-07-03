@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KriaSoft.AspNet.Identity.EntityFramework
+namespace XperiAndri.AspNet.Identity.EntityFramework.Models
 {
     using System;
     using System.Data.Entity;
@@ -25,9 +25,9 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserClaim> UserClaims { get; set; }
         public virtual DbSet<UserLogin> UserLogins { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
+        public virtual DbSet<User> Users { get; set; }
     }
 }

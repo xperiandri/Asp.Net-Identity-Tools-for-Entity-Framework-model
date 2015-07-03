@@ -7,14 +7,14 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KriaSoft.AspNet.Identity.EntityFramework
+namespace XperiAndri.AspNet.Identity.EntityFramework.Models
 {
     using System;
     using System.Collections.Generic;
     
     public partial class UserLogin
     {
-        public int UserId { get; set; }
+        public System.Guid UserId { get; set; }
         public string LoginProvider { get; set; }
         public string ProviderKey { get; set; }
     

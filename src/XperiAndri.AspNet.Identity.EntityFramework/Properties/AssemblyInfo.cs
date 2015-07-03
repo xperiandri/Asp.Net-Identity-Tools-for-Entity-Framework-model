@@ -1,4 +1,4 @@
-﻿// Copyright (c) KriaSoft, LLC.  All rights reserved.  See LICENSE.txt in the project root for license information.
+﻿// Copyright (c) XperiAndri, LLC.  All rights reserved.  See LICENSE.txt in the project root for license information.
 
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("KriaSoft.AspNet.Identity.EntityFramework")]
+[assembly: AssemblyTitle("XperiAndri.AspNet.Identity.EntityFramework")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("KriaSoft")]
-[assembly: AssemblyProduct("KriaSoft.AspNet.Identity.EntityFramework")]
-[assembly: AssemblyCopyright("Copyright © 2014 KriaSoft")]
+[assembly: AssemblyCompany("XperiAndri")]
+[assembly: AssemblyProduct("XperiAndri.AspNet.Identity.EntityFramework")]
+[assembly: AssemblyCopyright("Copyright © 2015 XperiAndri")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

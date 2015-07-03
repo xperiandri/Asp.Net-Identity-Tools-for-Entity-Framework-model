@@ -7,9 +7,12 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNet.Identity;
 
-namespace KriaSoft.AspNet.Identity.EntityFramework
+using XperiAndri.AspNet.Identity.EntityFramework;
+using XperiAndri.AspNet.Identity.EntityFramework.Models;
+
+namespace XperiAndri.AspNet.Identity.EntityFramework.Identity
 {
-    public class RoleStore : IQueryableRoleStore<UserRole, int>
+    public class RoleStore : IQueryableRoleStore<UserRole, Guid>
     {
         private readonly ApplicationDbContext db;
 
@@ -49,7 +52,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             return this.db.SaveChangesAsync();
         }
 
-        public Task<UserRole> FindByIdAsync(int roleId)
+        public Task<UserRole> FindByIdAsync(Guid roleId)
         {
             return this.db.UserRoles.FindAsync(new[] { roleId });
         }

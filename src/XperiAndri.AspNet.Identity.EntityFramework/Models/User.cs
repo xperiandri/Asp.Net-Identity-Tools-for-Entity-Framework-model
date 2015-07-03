@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KriaSoft.AspNet.Identity.EntityFramework
+namespace XperiAndri.AspNet.Identity.EntityFramework.Models
 {
     using System;
     using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             this.Roles = new HashSet<UserRole>();
         }
     
-        public int Id { get; set; }
+        public System.Guid UserId { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
         public bool EmailConfirmed { get; set; }

@@ -6,16 +6,17 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
-using KriaSoft.AspNet.Identity.EntityFramework;
+using XperiAndri.AspNet.Identity.EntityFramework;
+using XperiAndri.AspNet.Identity.EntityFramework.Models;
 
-namespace KriaSoft.AspNet.Identity.DbFirst.Security
+namespace XperiAndri.AspNet.Identity.DbFirst.Security
 {
     public class ApplicationOAuthProvider : OAuthAuthorizationServerProvider
     {
         private readonly string publicClientId;
-        private readonly Func<UserManager<User, int>> userManagerFactory;
+        private readonly Func<UserManager<User, Guid>> userManagerFactory;
 
-        public ApplicationOAuthProvider(string publicClientId, Func<UserManager<User, int>> userManagerFactory)
+        public ApplicationOAuthProvider(string publicClientId, Func<UserManager<User, Guid>> userManagerFactory)
         {
             if (publicClientId == null)
             {

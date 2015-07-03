@@ -4,12 +4,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("KriaSoft.AspNet.Identity.DbFirst")]
+[assembly: AssemblyTitle("XperiAndri.AspNet.Identity.DbFirst")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("KriaSoft")]
-[assembly: AssemblyProduct("KriaSoft.AspNet.Identity.DbFirst")]
-[assembly: AssemblyCopyright("Copyright © 2014 KriaSoft")]
+[assembly: AssemblyCompany("XperiAndri")]
+[assembly: AssemblyProduct("XperiAndri.AspNet.Identity.DbFirst")]
+[assembly: AssemblyCopyright("Copyright © 2014 XperiAndri")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

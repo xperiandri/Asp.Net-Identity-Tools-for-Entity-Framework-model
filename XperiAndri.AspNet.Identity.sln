@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".settings", ".settings", "{37F10E31-9EC4-4119-8DB5-03C780D049F6}"
 	ProjectSection(SolutionItems) = preProject
@@ -14,17 +14,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".settings", ".settings", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{BC75208A-D1F8-45F5-9109-A07252BAE377}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KriaSoft.AspNet.Identity.DbFirst", "examples\KriaSoft.AspNet.Identity.DbFirst\KriaSoft.AspNet.Identity.DbFirst.csproj", "{6F013146-8A52-4B79-9B87-762647CD8600}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XperiAndri.AspNet.Identity.DbFirst", "examples\XperiAndri.AspNet.Identity.DbFirst\XperiAndri.AspNet.Identity.DbFirst.csproj", "{6F013146-8A52-4B79-9B87-762647CD8600}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D306510E-56AA-46E9-A882-0B65386D51EE}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "KriaSoft.AspNet.Identity.Database", "src\KriaSoft.AspNet.Identity.Database\KriaSoft.AspNet.Identity.Database.sqlproj", "{C77AFCBD-25B7-4500-92DC-1248EDD6A89E}"
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "XperiAndri.AspNet.Identity.Database", "src\XperiAndri.AspNet.Identity.Database\XperiAndri.AspNet.Identity.Database.sqlproj", "{C77AFCBD-25B7-4500-92DC-1248EDD6A89E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KriaSoft.AspNet.Identity.EntityFramework", "src\KriaSoft.AspNet.Identity.EntityFramework\KriaSoft.AspNet.Identity.EntityFramework.csproj", "{311FECA9-F3CE-49A7-B085-B9DAFA25CA0A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XperiAndri.AspNet.Identity.EntityFramework", "src\XperiAndri.AspNet.Identity.EntityFramework\XperiAndri.AspNet.Identity.EntityFramework.csproj", "{311FECA9-F3CE-49A7-B085-B9DAFA25CA0A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{51153F63-66A3-4DC4-A7DA-1AA66F966D91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KriaSoft.AspNet.Identity.EntityFramework.Tests", "test\KriaSoft.AspNet.Identity.EntityFramework.Tests\KriaSoft.AspNet.Identity.EntityFramework.Tests.csproj", "{EDB5DE31-B19F-4105-8150-093CADEEB206}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XperiAndri.AspNet.Identity.EntityFramework.Tests", "test\XperiAndri.AspNet.Identity.EntityFramework.Tests\XperiAndri.AspNet.Identity.EntityFramework.Tests.csproj", "{EDB5DE31-B19F-4105-8150-093CADEEB206}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C82E2BD5-3C58-4AF1-8596-613F67CA0090}"
 	ProjectSection(SolutionItems) = preProject
@@ -64,5 +64,8 @@ Global
 		{C77AFCBD-25B7-4500-92DC-1248EDD6A89E} = {D306510E-56AA-46E9-A882-0B65386D51EE}
 		{311FECA9-F3CE-49A7-B085-B9DAFA25CA0A} = {D306510E-56AA-46E9-A882-0B65386D51EE}
 		{EDB5DE31-B19F-4105-8150-093CADEEB206} = {51153F63-66A3-4DC4-A7DA-1AA66F966D91}
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = 2e9aa1bb-4290-452c-8da4-ed003f142fe2
 	EndGlobalSection
 EndGlobal

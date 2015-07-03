@@ -10,13 +10,15 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNet.Identity;
 
-namespace KriaSoft.AspNet.Identity.EntityFramework
+using $rootnamespace$.Models;
+
+namespace $rootnamespace$.Identity
 {
     public partial class UserStore :
-        IQueryableUserStore<User, int>, IUserPasswordStore<User, int>, IUserLoginStore<User, int>,
-        IUserClaimStore<User, int>, IUserRoleStore<User, int>, IUserSecurityStampStore<User, int>,
-        IUserEmailStore<User, int>, IUserPhoneNumberStore<User, int>, IUserTwoFactorStore<User, int>,
-        IUserLockoutStore<User, int>
+        IQueryableUserStore<User, Guid>, IUserPasswordStore<User, Guid>, IUserLoginStore<User, Guid>,
+        IUserClaimStore<User, Guid>, IUserRoleStore<User, Guid>, IUserSecurityStampStore<User, Guid>,
+        IUserEmailStore<User, Guid>, IUserPhoneNumberStore<User, Guid>, IUserTwoFactorStore<User, Guid>,
+        IUserLockoutStore<User, Guid>
     {
         private readonly ApplicationDbContext db;
 
@@ -30,7 +32,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             this.db = db;
         }
 
-        //// IQueryableUserStore<User, int>
+        //// IQueryableUserStore<User, Guid>
 
         public IQueryable<User> Users
         {
@@ -51,11 +53,11 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             return this.db.SaveChangesAsync();
         }
 
-        public Task<User> FindByIdAsync(int userId)
+        public Task<User> FindByIdAsync(Guid userId)
         {
             return this.db.Users
                 .Include(u => u.Logins).Include(u => u.Roles).Include(u => u.Claims)
-                .FirstOrDefaultAsync(u => u.Id.Equals(userId));
+                .FirstOrDefaultAsync(u => u.UserId.Equals(userId));
         }
 
         public Task<User> FindByNameAsync(string userName)
@@ -69,7 +71,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
         {
             this.db.Entry<User>(user).State = EntityState.Modified;
             return this.db.SaveChangesAsync();
-        } 
+        }
 
         //// IUserPasswordStore<User, Key>
 
@@ -97,7 +99,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
 
             user.PasswordHash = passwordHash;
             return Task.FromResult(0);
-        } 
+        }
 
         //// IUserLoginStore<User, Key>
 
@@ -114,7 +116,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             }
 
             var userLogin = Activator.CreateInstance<UserLogin>();
-            userLogin.UserId = user.Id;
+            userLogin.UserId = user.UserId;
             userLogin.LoginProvider = login.ProviderKey;
             userLogin.ProviderKey = login.ProviderKey;
             user.Logins.Add(userLogin);
@@ -140,7 +142,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
 
             return await this.db.Users
                 .Include(u => u.Logins).Include(u => u.Roles).Include(u => u.Claims)
-                .FirstOrDefaultAsync(u => u.Id.Equals(userLogin.UserId));
+                .FirstOrDefaultAsync(u => u.UserId.Equals(userLogin.UserId));
         }
 
         public Task<IList<UserLoginInfo>> GetLoginsAsync(User user)
@@ -176,9 +178,9 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             }
 
             return Task.FromResult(0);
-        } 
+        }
 
-        //// IUserClaimStore<User, int>
+        //// IUserClaimStore<User, Guid>
 
         public Task AddClaimAsync(User user, Claim claim)
         {
@@ -193,7 +195,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             }
 
             var item = Activator.CreateInstance<UserClaim>();
-            item.UserId = user.Id;
+            item.UserId = user.UserId;
             item.ClaimType = claim.Type;
             item.ClaimValue = claim.Value;
             user.Claims.Add(item);
@@ -227,15 +229,15 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
                 user.Claims.Remove(item);
             }
 
-            foreach (var item in this.db.UserClaims.Where(uc => uc.UserId.Equals(user.Id) && uc.ClaimValue == claim.Value && uc.ClaimType == claim.Type).ToList())
+            foreach (var item in this.db.UserClaims.Where(uc => uc.UserId.Equals(user.UserId) && uc.ClaimValue == claim.Value && uc.ClaimType == claim.Type).ToList())
             {
                 this.db.UserClaims.Remove(item);
             }
 
             return Task.FromResult(0);
-        } 
+        }
 
-        //// IUserRoleStore<User, int>
+        //// IUserRoleStore<User, Guid>
 
         public Task AddToRoleAsync(User user, string roleName)
         {
@@ -267,7 +269,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
                 throw new ArgumentNullException("user");
             }
 
-            return Task.FromResult<IList<string>>(user.Roles.Join(this.db.UserRoles, ur => ur.Id, r => r.Id, (ur, r) => r.Name).ToList());
+            return Task.FromResult<IList<string>>(user.Roles.Join(this.db.UserRoles, ur => ur.RoleId, r => r.RoleId, (ur, r) => r.Name).ToList());
         }
 
         public Task<bool> IsInRoleAsync(User user, string roleName)
@@ -284,7 +286,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
 
             return
                 Task.FromResult<bool>(
-                    this.db.UserRoles.Any(r => r.Name == roleName && r.Users.Any(u => u.Id.Equals(user.Id))));
+                    this.db.UserRoles.Any(r => r.Name == roleName && r.Users.Any(u => u.UserId.Equals(user.UserId))));
         }
 
         public Task RemoveFromRoleAsync(User user, string roleName)
@@ -307,9 +309,9 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             }
 
             return Task.FromResult(0);
-        } 
+        }
 
-        //// IUserSecurityStampStore<User, int>
+        //// IUserSecurityStampStore<User, Guid>
 
         public Task<string> GetSecurityStampAsync(User user)
         {
@@ -330,9 +332,9 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
 
             user.SecurityStamp = stamp;
             return Task.FromResult(0);
-        } 
+        }
 
-        //// IUserEmailStore<User, int>
+        //// IUserEmailStore<User, Guid>
 
         public Task<User> FindByEmailAsync(string email)
         {
@@ -383,7 +385,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             return Task.FromResult(0);
         }
 
-        //// IUserPhoneNumberStore<User, int>
+        //// IUserPhoneNumberStore<User, Guid>
 
         public Task<string> GetPhoneNumberAsync(User user)
         {
@@ -427,7 +429,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             return Task.FromResult(0);
         }
 
-        //// IUserTwoFactorStore<User, int>
+        //// IUserTwoFactorStore<User, Guid>
 
         public Task<bool> GetTwoFactorEnabledAsync(User user)
         {
@@ -450,7 +452,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
             return Task.FromResult(0);
         }
 
-        //// IUserLockoutStore<User, int>
+        //// IUserLockoutStore<User, Guid>
 
         public Task<int> GetAccessFailedCountAsync(User user)
         {

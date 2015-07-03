@@ -1,24 +1,27 @@
-ASP.NET Identity with EF DbFirst
+ASP.NET Identity tools for Entity Framework model
 ================================
 
 > This projects demonstrates how to use [ASP.NET Identity](http://asp.net/identity) with
-> Entity Framework Database-First model.
+> Entity Framework data model.
 
-[Getting Started with ASP.NET Identity and EF Database-First](./docs/Database-First.md)
+[Getting Started with ASP.NET Identity tools for Entity Framework model](./docs/Entity-Data-Model.md)
 
 ![ASP.NET Identity Model](http://i.imgur.com/KHDqq3B.png)
 
 ### Download
 
-http://visualstudiogallery.msdn.microsoft.com/6780f8e4-d204-4e88-83c2-853098727ffb
+[Visual Studio 2013](https://visualstudiogallery.msdn.microsoft.com/cd93cdd1-97ed-4a57-8aea-5c07c71a294c)
 
-![ASP.NET Identity Database Project Template](http://i.imgur.com/5rxiyS2.png)
+[Visual Studio 2015](https://visualstudiogallery.msdn.microsoft.com/e48464e9-5f10-442a-a6a3-a30117dd5209)
+
+![ASP.NET Identity Database Project Template](./docs/img/Create project.png)
 
 ![ASP.NET Identity Database](http://i.imgur.com/9jV1deH.png)
 
 ### Authors
 
- * [Konstantin Tarkus](https://angel.co/koistya) ([hello@tarkus.me](mailto:hello@tarkuks.me?subject=ASP.NET+Identity+Providers)), KriaSoft LLC.
+ * [Andrii Chebukin](http://www.fb.com/xperiandri) ([xperiandri@outlook.com](mailto:hello@tarkuks.me?subject=ASP.NET+Identity+tools+for+Entity+Framework+model)) - author of improved version
+ * [Konstantin Tarkus](https://angel.co/koistya) ([hello@tarkus.me](mailto:hello@tarkuks.me?subject=ASP.NET+Identity+Providers)) - original author
 
 ### License
 

@@ -4,7 +4,7 @@
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseName>AspNetIdentity</TargetDatabaseName>
     <DeployScriptFileName>Database.sql</DeployScriptFileName>
-    <TargetConnectionString>Data Source=(LocalDb)\v11.0;Integrated Security=True;Pooling=False;Connect Timeout=30</TargetConnectionString>
+    <TargetConnectionString>Data Source=(LocalDb)\ProjectsV12;Integrated Security=True;Pooling=False;Connect Timeout=30</TargetConnectionString>
     <BlockWhenDriftDetected>True</BlockWhenDriftDetected>
     <RegisterDataTierApplication>True</RegisterDataTierApplication>
     <ProfileVersionNumber>1</ProfileVersionNumber>

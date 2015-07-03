@@ -1,6 +1,6 @@
-﻿CREATE TABLE [dbo].[User]
+﻿CREATE TABLE [dbo].[Users]
 (
-    [UserID]               INT IDENTITY (1000, 1) NOT NULL,
+    [UserId]               UNIQUEIDENTIFIER       NOT NULL DEFAULT NEWID(),
     [UserName]             [dbo].[Name]           NOT NULL,
     [Email]                [dbo].[Email]          NULL,
     [EmailConfirmed]       [dbo].[Flag]           NOT NULL,
@@ -13,6 +13,6 @@
     [LockoutEnabled]       [dbo].[Flag]           NOT NULL,
     [AccessFailedCount]    INT                    NOT NULL,
 
-    CONSTRAINT [PK_User_UserID] PRIMARY KEY CLUSTERED ([UserID] ASC),
-    CONSTRAINT [UK_User_UserName] UNIQUE NONCLUSTERED ([UserName] ASC)
+    CONSTRAINT [PK_Users_UserID] PRIMARY KEY CLUSTERED ([UserId] ASC),
+    CONSTRAINT [UK_Users_UserName] UNIQUE NONCLUSTERED ([UserName] ASC)
 );

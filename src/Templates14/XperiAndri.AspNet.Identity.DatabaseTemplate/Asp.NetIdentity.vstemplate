@@ -4,7 +4,7 @@
     <Name>ASP.NET Identity Guid Key Database</Name>
     <Description>SQL Database project template for ASP.NET Identity 2 with GUID key columns.</Description>
     <Icon>TemplateIcon.ico</Icon>
-    <ProjectType>SQLDB</ProjectType>
+    <ProjectType>Database</ProjectType>
     <SortOrder>1000</SortOrder>
     <TemplateID>46c64127-637c-46d1-9aa6-137ea25760eb</TemplateID>
     <CreateNewFolder>true</CreateNewFolder>

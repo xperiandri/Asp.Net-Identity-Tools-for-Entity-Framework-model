@@ -2,7 +2,7 @@
   <TemplateData>
     <Name>ASPNET Identity Guidbased Database</Name>
     <Description>ASPNET Identity 2.0 Database template with Guid ids</Description>
-    <ProjectType>SQLDB</ProjectType>
+    <ProjectType>Database</ProjectType>
     <ProjectSubType>
     </ProjectSubType>
     <SortOrder>1000</SortOrder>
